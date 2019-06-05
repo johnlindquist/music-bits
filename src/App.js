@@ -38,20 +38,20 @@ const App = () => {
     setNotes(newNotes)
   }
 
-  const clamp = (bits, fill = 0) => {
+  const clamp = length => (bits, fill = 0) => {
     const stringBits = bits.toString(2)
 
-    return stringBits.length === 8
+    return stringBits.length === length
       ? stringBits
-      : stringBits.length > 8
-      ? stringBits.substr(-8)
-      : new Array(8 - stringBits.length).fill(fill).join("") + stringBits
+      : stringBits.length > length
+      ? stringBits.substr(-length)
+      : new Array(length - stringBits.length).fill(fill).join("") + stringBits
   }
 
   const shift = (fn, fill) => event => {
     const bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
     const newBits = fn(bits)
-    const stringBits = clamp(newBits, fill && [...clamp(bits)][0])
+    const stringBits = clamp(8)(newBits, fill && [...clamp(8)(bits)][0])
     const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
     setNotes(newNotes)
   }
