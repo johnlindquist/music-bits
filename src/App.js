@@ -31,14 +31,6 @@ function SynthButton(props) {
 const App = () => {
   const [notes, setNotes] = useState(initNotes)
 
-  // const updateNotes = bits => {
-  //   const stringBits = toBit(bits, 8).substring(2)
-  //   console.log(stringBits)
-  //   const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
-  //   console.log(newNotes)
-  //   setNotes(newNotes)
-  // }
-
   const toggleBit = targetNote => {
     const newNotes = notes.map(([note, bit], i) => {
       note === targetNote && (bit = Math.abs(bit - 1))
@@ -60,11 +52,28 @@ const App = () => {
     console.log(newNotes)
     setNotes(newNotes)
   }
+
+  const arithmeticShiftRight = () => {
+    let bitsString = notes.map(([, bit]) => bit).join("")
+    let newBits = (parseInt(bitsString, 2) >> 1).toString(2)
+
+    if (newBits.length < 8)
+      newBits =
+        Array.from({ length: 8 - newBits.length })
+          .map(() => bitsString[0])
+          .join("") + newBits
+
+    console.log({ newBits })
+    const newNotes = notes.map(([note], i) => [note, +newBits[i]])
+    // console.log(newNotes)
+    setNotes(newNotes)
+  }
+
   const shiftRight = () => {
     const bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
     console.log({ bits })
 
-    const newBits = bits >> 1
+    const newBits = bits >>> 1
     const stringBits = toBit(newBits, 8).substring(2)
     console.log({ stringBits })
     const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
@@ -88,6 +97,7 @@ const App = () => {
 
   const leftShift = "<<"
   const rightShift = ">>"
+  const arithmeticRightShift = ">>>"
   return (
     <>
       <div style={{ fontFamily: "monospace" }}>{`0b${notes
@@ -105,9 +115,17 @@ const App = () => {
           />
         )
       })}
+      <button onClick={arithmeticShiftRight}>{arithmeticRightShift}</button>
       <button onClick={shiftRight}>{rightShift}</button>
       <div>
         <button onClick={invert}>~</button>
+      </div>
+      <hr />
+      <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
+        {arithmeticRightShift} fills left with current 1st bit (one or zero)
+      </div>
+      <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
+        {rightShift} fills left with zeroes (always zero)
       </div>
     </>
   )
