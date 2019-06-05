@@ -121,12 +121,13 @@ const App = () => {
         <button onClick={invert}>~</button>
       </div>
       <hr />
+
+      <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
+        {zeroFillRightShift} fills left with zeroes (always zero)
+      </div>
       <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
         {signPropagatingRightShift} fills left with current 1st bit (one or
         zero)
-      </div>
-      <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
-        {zeroFillRightShift} fills left with zeroes (always zero)
       </div>
     </>
   )
