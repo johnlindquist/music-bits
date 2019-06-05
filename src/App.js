@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react"
-import { toBit } from "./utils"
+import React, { useState } from "react"
 import "./App.css"
 import Tone from "tone"
 
@@ -32,64 +31,28 @@ const App = () => {
   const [notes, setNotes] = useState(initNotes)
 
   const toggleBit = targetNote => {
-    const newNotes = notes.map(([note, bit], i) => {
-      note === targetNote && (bit = Math.abs(bit - 1))
-      return [note, bit]
-    })
+    const newNotes = notes.map(([note, bit]) =>
+      note !== targetNote ? [note, bit] : [note, -(bit - 1)]
+    )
 
     setNotes(newNotes)
   }
 
-  const shiftLeft = () => {
+  const clamp = (bits, fill = 0) => {
+    const stringBits = bits.toString(2)
+
+    return stringBits.length === 8
+      ? stringBits
+      : stringBits.length > 8
+      ? stringBits.substr(-8)
+      : new Array(8 - stringBits.length).fill(fill).join("") + stringBits
+  }
+
+  const shift = (fn, fill) => event => {
     const bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
-    console.log({ bits })
-
-    const newBits = bits << 1
-    let stringBits = toBit(newBits, 8).substring(2)
-    stringBits.length > 8 && (stringBits = stringBits.substring(1))
-    console.log({ stringBits })
+    const newBits = fn(bits)
+    const stringBits = clamp(newBits, fill && [...clamp(bits)][0])
     const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
-    console.log(newNotes)
-    setNotes(newNotes)
-  }
-
-  const signPropagatingShiftRight = () => {
-    let bitsString = notes.map(([, bit]) => bit).join("")
-    let newBits = (parseInt(bitsString, 2) >> 1).toString(2)
-
-    if (newBits.length < 8)
-      newBits =
-        Array.from({ length: 8 - newBits.length })
-          .map(() => bitsString[0])
-          .join("") + newBits
-
-    const newNotes = notes.map(([note], i) => [note, +newBits[i]])
-    setNotes(newNotes)
-  }
-
-  const zeroFillShiftRight = () => {
-    const bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
-    console.log({ bits })
-
-    const newBits = bits >>> 1
-    const stringBits = toBit(newBits, 8).substring(2)
-    console.log({ stringBits })
-    const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
-    // console.log(newNotes)
-    setNotes(newNotes)
-  }
-  const invert = () => {
-    let bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
-    console.log({ bits })
-
-    let newBits = ~bits
-    newBits < 0 && (newBits += 256)
-
-    console.log({ newBits })
-    const stringBits = toBit(newBits, 8).substring(2)
-    console.log({ stringBits })
-    const newNotes = notes.map(([note], i) => [note, +stringBits[i]])
-    // console.log(newNotes)
     setNotes(newNotes)
   }
 
@@ -101,7 +64,7 @@ const App = () => {
       <div style={{ fontFamily: "monospace" }}>{`0b${notes
         .map(([, bit]) => bit)
         .join("")}`}</div>
-      <button onClick={shiftLeft}>{leftShift}</button>
+      <button onClick={shift(bits => bits << 1)}>{leftShift}</button>
       {notes.map(([note, bit]) => {
         return (
           <SynthButton
@@ -113,12 +76,12 @@ const App = () => {
           />
         )
       })}
-      <button onClick={zeroFillShiftRight}>{zeroFillRightShift}</button>
-      <button onClick={signPropagatingShiftRight}>
+      <button onClick={shift(bits => bits >>> 1)}>{zeroFillRightShift}</button>
+      <button onClick={shift(bits => bits >> 1, true)}>
         {signPropagatingRightShift}
       </button>
       <div>
-        <button onClick={invert}>~</button>
+        <button onClick={shift(bits => ~bits >>> 0)}>~</button>
       </div>
       <hr />
 
