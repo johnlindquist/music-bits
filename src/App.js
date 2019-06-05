@@ -53,7 +53,7 @@ const App = () => {
     setNotes(newNotes)
   }
 
-  const arithmeticShiftRight = () => {
+  const signPropagatingShiftRight = () => {
     let bitsString = notes.map(([, bit]) => bit).join("")
     let newBits = (parseInt(bitsString, 2) >> 1).toString(2)
 
@@ -63,13 +63,11 @@ const App = () => {
           .map(() => bitsString[0])
           .join("") + newBits
 
-    console.log({ newBits })
     const newNotes = notes.map(([note], i) => [note, +newBits[i]])
-    // console.log(newNotes)
     setNotes(newNotes)
   }
 
-  const shiftRight = () => {
+  const zeroFillShiftRight = () => {
     const bits = parseInt(notes.map(([, bit]) => bit).join(""), 2)
     console.log({ bits })
 
@@ -96,8 +94,8 @@ const App = () => {
   }
 
   const leftShift = "<<"
-  const rightShift = ">>"
-  const arithmeticRightShift = ">>>"
+  const signPropagatingRightShift = ">>"
+  const zeroFillRightShift = ">>>"
   return (
     <>
       <div style={{ fontFamily: "monospace" }}>{`0b${notes
@@ -115,17 +113,20 @@ const App = () => {
           />
         )
       })}
-      <button onClick={arithmeticShiftRight}>{arithmeticRightShift}</button>
-      <button onClick={shiftRight}>{rightShift}</button>
+      <button onClick={zeroFillShiftRight}>{zeroFillRightShift}</button>
+      <button onClick={signPropagatingShiftRight}>
+        {signPropagatingRightShift}
+      </button>
       <div>
         <button onClick={invert}>~</button>
       </div>
       <hr />
       <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
-        {arithmeticRightShift} fills left with current 1st bit (one or zero)
+        {signPropagatingRightShift} fills left with current 1st bit (one or
+        zero)
       </div>
       <div style={{ fontFamily: "monospace", fontSize: ".75rem" }}>
-        {rightShift} fills left with zeroes (always zero)
+        {zeroFillRightShift} fills left with zeroes (always zero)
       </div>
     </>
   )
